@@ -5,6 +5,7 @@ const { contactErrorsHandler } = require('./helpers/errorHandlers')
 require('dotenv').config()
 
 const contactsRouter = require('./routes/api/contacts')
+const authRouter = require('./routes/api/user')
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use('/users', authRouter)
 app.use('/api/contacts', contactsRouter)
 
 app.use(contactErrorsHandler)

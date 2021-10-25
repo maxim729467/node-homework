@@ -9,18 +9,20 @@ const {
   updateFavContact
 } = require('../../controllers/contactControllers')
 
+const authMiddleware = require('../../middlewares/authMiddleware')
+
 const {
   validatePostedContact,
   validateUpdatedContact,
   validateFavContact,
 } = require('../../middlewares/validationMiddleware')
 
-router.get('/', listContacts)
-router.get('/:contactId', getContactById)
-router.post('/', [validatePostedContact, addContact])
-router.delete('/:contactId', removeContact)
-router.patch('/:contactId', [validateUpdatedContact, updateContact])
+router.get('/', authMiddleware, listContacts)
+router.get('/:contactId', authMiddleware, getContactById)
+router.post('/', authMiddleware, validatePostedContact, addContact)
+router.delete('/:contactId', authMiddleware, removeContact)
+router.patch('/:contactId', authMiddleware, validateUpdatedContact, updateContact)
 router.patch(
-  '/:contactId/favorite', [validateFavContact, updateFavContact])
+  '/:contactId/favorite', authMiddleware, validateFavContact, updateFavContact)
 
 module.exports = router

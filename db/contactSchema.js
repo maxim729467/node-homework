@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { Schema } = mongoose
+const { Schema, SchemaTypes } = mongoose
 
 const contactSchema = new Schema({
   name: {
@@ -17,6 +17,10 @@ const contactSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: 'User',
+  }
 }, {
   toJSON: {
     transform: (doc, ret) => {
@@ -28,6 +32,4 @@ const contactSchema = new Schema({
 
 const Contact = mongoose.model('Contact', contactSchema)
 
-module.exports = {
-  Contact
-}
+module.exports = Contact
