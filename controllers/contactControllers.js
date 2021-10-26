@@ -1,8 +1,9 @@
-const { Contact } = require('../db/contactSchema')
+const Contact = require('../db/contactSchema')
 
 const listContacts = async (req, res, next) => {
+  const owner = req.userId
   try {
-    const contacts = await Contact.find({})
+    const contacts = await Contact.find({ owner })
     res.json({ message: 'success', contacts })
   } catch (error) {
     next(error)
@@ -10,9 +11,11 @@ const listContacts = async (req, res, next) => {
 }
 
 const getContactById = async (req, res, next) => {
+  const owner = req.userId
+
   try {
     const { contactId } = req.params
-    const contact = await Contact.findById(contactId)
+    const contact = await Contact.findOne({ _id: contactId, owner }).exec()
     if (contact) {
       return res.json({ message: 'success', contact })
     }
@@ -23,9 +26,11 @@ const getContactById = async (req, res, next) => {
 }
 
 const removeContact = async (req, res, next) => {
+  const { contactId } = req.params
+  const owner = req.userId
+
   try {
-    const { contactId } = req.params
-    const contact = await Contact.findByIdAndRemove(contactId)
+    const contact = await Contact.findOneAndRemove({ _id: contactId, owner }).exec()
     if (contact) {
       return res.json({ message: 'success', contact })
     }
@@ -37,15 +42,16 @@ const removeContact = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   const { email } = req.body
+  const owner = req.userId
 
   try {
-    const searchedEmail = await Contact.findOne({ email })
+    const searchedEmail = await Contact.findOne({ email }).exec()
 
     if (searchedEmail) {
       throw new Error('email exists')
     }
 
-    const contact = new Contact({ ...req.body })
+    const contact = new Contact({ ...req.body, owner })
     await contact.save()
     return res.status(201).json({ message: 'success', data: { contact } })
   } catch (error) {
@@ -54,9 +60,10 @@ const addContact = async (req, res, next) => {
 }
 
 const updateContact = async (req, res, next) => {
+  const owner = req.userId
   try {
     const { contactId } = req.params
-    const contact = await Contact.findByIdAndUpdate(contactId, req.body, { new: true })
+    const contact = await Contact.findOneAndUpdate({ _id: contactId, owner }, req.body, { new: true }).exec()
     if (contact) {
       return res.json({ message: 'success', data: { contact } })
     }
@@ -67,9 +74,10 @@ const updateContact = async (req, res, next) => {
 }
 
 const updateFavContact = async (req, res, next) => {
+  const owner = req.userId
   try {
     const { contactId } = req.params
-    const contact = await Contact.findByIdAndUpdate(contactId, req.body, { new: true })
+    const contact = await Contact.findOneAndUpdate({ _id: contactId, owner }, req.body, { new: true }).exec()
     if (contact) {
       return res.json({ message: 'success', data: { contact } })
     }

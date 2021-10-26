@@ -34,6 +34,21 @@ const contactErrorsHandler = ({ message }, req, res, next) => {
     return
   }
 
+  if (message.includes('Email in use')) {
+    res.sendError(409, message)
+    return
+  }
+
+  if (message.includes('Email or password is wrong')) {
+    res.sendError(401, message)
+    return
+  }
+
+  if (message.includes('Unauthorized')) {
+    res.sendError(401, message)
+    return
+  }
+
   res.sendError(400, message)
 }
 
