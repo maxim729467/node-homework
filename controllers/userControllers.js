@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt')
 const User = require('../db/userSchema')
+const fs = require('fs/promises')
+const path = require('path')
 const { createToken } = require('../helpers/tokenUtils')
+const UploadService = require('../helpers/uploadService')
 
 const loginUser = async (req, res, next) => {
   try {
@@ -32,9 +35,9 @@ const signupUser = async (req, res, next) => {
       throw new Error('Email in use')
     }
     const user = new User({ email, password })
-    await user.save()
+    const newUser = await user.save()
 
-    return res.status(201).json({ user })
+    return res.status(201).json({ newUser })
   } catch (error) {
     next(error)
   }
@@ -42,9 +45,9 @@ const signupUser = async (req, res, next) => {
 
 const logoutUser = async (req, res, next) => {
   try {
-    const id = req.userId
+    const { _id } = req.user
 
-    await User.findByIdAndUpdate(id, { token: null })
+    await User.findByIdAndUpdate(_id, { token: null })
 
     return res.status(204).json({})
   } catch (error) {
@@ -54,9 +57,24 @@ const logoutUser = async (req, res, next) => {
 
 const checkCurrentUser = async (req, res, next) => {
   try {
-    const id = req.userId
-    const user = await User.findById(id)
+    const { _id } = req.user
+    const user = await User.findById(_id)
 
+    return res.status(200).json({ user })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const uploadAvatar = async (req, res, next) => {
+  try {
+    const { _id } = req.user
+    const file = req.file
+    const dest = path.resolve('./public/avatars')
+    const uploadService = new UploadService(file, dest)
+    await uploadService.process()
+
+    const user = await User.findByIdAndUpdate(_id, { avatarURL: file.filename }, { new: true })
     return res.status(200).json({ user })
   } catch (error) {
     next(error)
@@ -68,4 +86,5 @@ module.exports = {
   signupUser,
   logoutUser,
   checkCurrentUser,
+  uploadAvatar,
 }

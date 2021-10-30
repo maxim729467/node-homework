@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 const bcrypt = require('bcrypt')
+const gravatar = require('gravatar')
 const saltRounds = 10
 
 const userSchema = new Schema({
@@ -13,6 +14,12 @@ const userSchema = new Schema({
     required: [true, 'Email is required'],
     unique: true,
     index: true,
+  },
+  avatarURL: {
+    type: String,
+    default: function() {
+      return gravatar.url(this.email, { s: '250' }, true)
+    }
   },
   subscription: {
     type: String,

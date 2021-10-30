@@ -6,6 +6,7 @@ require('dotenv').config()
 
 const contactsRouter = require('./routes/api/contacts')
 const authRouter = require('./routes/api/user')
+const filesRouter = require('./routes/api/filesRouter')
 
 const app = express()
 
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 
 app.use('/users', authRouter)
 app.use('/api/contacts', contactsRouter)
+app.use('/avatars', filesRouter)
 
 app.use(contactErrorsHandler)
 
