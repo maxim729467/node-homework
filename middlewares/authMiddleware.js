@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 const User = require('../db/userSchema')
-const { ObjectId } = require('mongodb')
 require('dotenv').config()
 const SECRET_KEY = process.env.JWT_SECRET_KEY
 
@@ -18,7 +17,6 @@ const authMiddleware = async (req, res, next) => {
 
   try {
     const { id } = jwt.decode(token, SECRET_KEY)
-    req.userId = ObjectId(id)
     const user = await User.findById(id)
 
     if (!user) {
@@ -29,6 +27,7 @@ const authMiddleware = async (req, res, next) => {
       next(new Error('Unauthorized'))
     }
 
+    req.user = user
     next()
   } catch (error) {
     next(error)
