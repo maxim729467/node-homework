@@ -1,57 +1,51 @@
-const contactErrorsHandler = (err, req, res, next) => {
-  if (err.message.includes('"favorite" is required')) {
-    res.sendError(400, 'missing field favorite')
-    return
+class NotAuthorizedError extends Error {
+  constructor(message) {
+    super(message)
+    this.status = 401
+  }
+}
+
+class ConflictError extends Error {
+  constructor(message) {
+    super(message)
+    this.status = 409
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message)
+    this.status = 404
+  }
+}
+
+class CustomError extends Error {
+  constructor(message) {
+    super(message)
+    this.status = 400
+  }
+}
+
+const errorHandler = (error, req, res, next) => {
+  if (
+    error instanceof NotAuthorizedError ||
+    error instanceof ConflictError ||
+    error instanceof NotFoundError ||
+    error instanceof CustomError
+  ) {
+    return res.status(error.status).json({ message: error.message })
+  }
+  if (error.message.includes('required')) {
+    return res.status(400).json({ message: error.message })
   }
 
-  if (err.message.includes('"name" is required')) {
-    res.sendError(400, 'missing field name')
-    return
-  }
-
-  if (err.message.includes('"email" is required')) {
-    res.sendError(400, 'missing field email')
-    return
-  }
-
-  if (err.message.includes('"phone" is required')) {
-    res.sendError(400, 'missing field phone')
-    return
-  }
-
-  if (err.message.includes('Cast to ObjectId failed')) {
-    res.sendError(400, 'wrong contact id')
-    return
-  }
-
-  if (err.message.includes('email exists')) {
-    res.sendError(400, 'contact with this email alredy exists')
-    return
-  }
-
-  if (err.message.includes('Contact with ID') && err.message.includes('not found')) {
-    res.sendError(400, err.message)
-    return
-  }
-
-  if (err.message.includes('Email in use')) {
-    res.sendError(409, err.message)
-    return
-  }
-
-  if (err.message.includes('Email or password is wrong')) {
-    res.sendError(401, err.message)
-    return
-  }
-
-  if (err.message.includes('Unauthorized')) {
-    res.sendError(401, err.message)
-    return
-  }
-
-  res.sendError(400, err)
+  res.status(500).json({ message: error.message })
 }
 
 module.exports = {
-  contactErrorsHandler,
+  NotAuthorizedError,
+  ConflictError,
+  NotFoundError,
+  CustomError,
+  errorHandler,
 }

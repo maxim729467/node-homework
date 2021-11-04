@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken')
 const User = require('../db/userSchema')
+const { NotAuthorizedError } = require('../helpers/errorHandlers')
+
 require('dotenv').config()
 const SECRET_KEY = process.env.JWT_SECRET_KEY
 
@@ -12,7 +14,8 @@ const authMiddleware = async (req, res, next) => {
   }
 
   if (!token) {
-    next(new Error('Unauthorized'))
+    next(new NotAuthorizedError('Unauthorized'))
+    return
   }
 
   try {
@@ -20,11 +23,13 @@ const authMiddleware = async (req, res, next) => {
     const user = await User.findById(id)
 
     if (!user) {
-      next(new Error('Unauthorized'))
+      next(new NotAuthorizedError('Unauthorized'))
+      return
     }
 
     if (token !== user.token) {
-      next(new Error('Unauthorized'))
+      next(new NotAuthorizedError('Unauthorized'))
+      return
     }
 
     req.user = user

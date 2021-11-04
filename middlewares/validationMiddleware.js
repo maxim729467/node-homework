@@ -37,6 +37,10 @@ const signupSchema = Joi.object({
   password: passwordSchema.required(),
 }).min(1)
 
+const reverificationSchema = Joi.object({
+  email: emailSchema.required(),
+}).min(1)
+
 const validate = async (schema, object, res, next) => {
   try {
     await schema.validateAsync(object)
@@ -66,10 +70,15 @@ const validateSignup = async (req, res, next) => {
   return await validate(signupSchema, req.body, res, next)
 }
 
+const validateReverification = async (req, res, next) => {
+  return await validate(reverificationSchema, req.body, res, next)
+}
+
 module.exports = {
   validatePostedContact,
   validateUpdatedContact,
   validateFavContact,
   validateLogin,
   validateSignup,
+  validateReverification,
 }
