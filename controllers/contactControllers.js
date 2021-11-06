@@ -1,4 +1,5 @@
 const Contact = require('../db/contactSchema')
+const { NotFoundError } = require('../helpers/errorHandlers')
 
 const listContacts = async (req, res, next) => {
   const owner = req.user._id
@@ -19,7 +20,8 @@ const getContactById = async (req, res, next) => {
     if (contact) {
       return res.json({ message: 'success', contact })
     }
-    throw new Error(`Contact with ID '${contactId}' is not found`)
+    next(new NotFoundError(`Contact with ID '${contactId}' is not found`))
+    return
   } catch (error) {
     next(error)
   }
@@ -34,7 +36,8 @@ const removeContact = async (req, res, next) => {
     if (contact) {
       return res.json({ message: 'success', contact })
     }
-    throw new Error(`Contact with ID '${contactId}' not found`)
+    next(new NotFoundError(`Contact with ID '${contactId}' is not found`))
+    return
   } catch (error) {
     next(error)
   }
@@ -60,7 +63,8 @@ const updateContact = async (req, res, next) => {
     if (contact) {
       return res.json({ message: 'success', data: { contact } })
     }
-    throw new Error(`Contact with ID '${contactId}' is not found`)
+    next(new NotFoundError(`Contact with ID '${contactId}' is not found`))
+    return
   } catch (error) {
     next(error)
   }
@@ -74,7 +78,8 @@ const updateFavContact = async (req, res, next) => {
     if (contact) {
       return res.json({ message: 'success', data: { contact } })
     }
-    throw new Error(`contact with ID '${contactId}' is not found`)
+    next(new NotFoundError(`Contact with ID '${contactId}' is not found`))
+    return
   } catch (error) {
     next(error)
   }
